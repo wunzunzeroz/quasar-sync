@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Kart (use curl with -L to follow redirects)
-RUN curl -fsSL -o /tmp/kart.deb https://github.com/koordinates/kart/releases/download/v0.17.0/kart_0.17.0-1_amd64.deb \
+RUN curl -fsSL -o /tmp/kart.deb https://github.com/koordinates/kart/releases/download/v0.17.0/kart_0.17.0_amd64.deb \
     && dpkg -i /tmp/kart.deb \
     && rm /tmp/kart.deb
 
