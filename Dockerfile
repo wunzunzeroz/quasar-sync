@@ -2,7 +2,6 @@ FROM debian:bookworm-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    wget \
     openssh-client \
     git \
     ca-certificates \
@@ -10,10 +9,10 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Kart
-RUN wget -q https://github.com/koordinates/kart/releases/download/v0.17.0/kart_0.17.0-1_amd64.deb \
-    && dpkg -i kart_0.17.0-1_amd64.deb \
-    && rm kart_0.17.0-1_amd64.deb
+# Install Kart (use curl with -L to follow redirects)
+RUN curl -fsSL -o /tmp/kart.deb https://github.com/koordinates/kart/releases/download/v0.17.0/kart_0.17.0-1_amd64.deb \
+    && dpkg -i /tmp/kart.deb \
+    && rm /tmp/kart.deb
 
 # Install Node.js 20 LTS
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
