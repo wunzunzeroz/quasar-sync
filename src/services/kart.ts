@@ -27,7 +27,9 @@ async function execKart(args: string[], cwd?: string): Promise<ExecResult> {
     });
 
     proc.on("error", (err) => {
-      reject(new KartError(`Failed to spawn kart: ${err.message}`, args.join(" "), null, ""));
+      reject(
+        new KartError(`Failed to spawn kart: ${err.message}`, args.join(" "), null, ""),
+      );
     });
 
     proc.on("close", (code) => {
@@ -65,9 +67,15 @@ export async function createWorkingCopy(
   repoPath: string,
   postgresUrl: string,
 ): Promise<void> {
-  logger.debug({ repoPath, postgresUrl: postgresUrl.replace(/:[^:@]+@/, ":***@") }, "Creating working copy");
+  logger.debug(
+    { repoPath, postgresUrl: postgresUrl.replace(/:[^:@]+@/, ":***@") },
+    "Creating working copy",
+  );
 
-  const result = await execKart(["create-workingcopy", postgresUrl], repoPath);
+  const result = await execKart(
+    ["create-workingcopy", "--delete-existing", postgresUrl],
+    repoPath,
+  );
 
   if (result.exitCode !== 0) {
     throw new KartError(
