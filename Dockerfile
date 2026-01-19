@@ -22,12 +22,19 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy package files and install ALL dependencies (including devDependencies for build)
 COPY package.json package-lock.json ./
-RUN npm ci --only=production
+RUN npm ci
 
-# Copy built application
-COPY dist/ ./dist/
+# Copy source and build
+COPY tsconfig.json ./
+COPY src/ ./src/
+RUN npm run build
+
+# Remove devDependencies after build
+RUN npm prune --production
+
+# Copy config
 COPY repos.yaml ./
 
 # Run the sync service

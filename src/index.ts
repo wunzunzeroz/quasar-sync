@@ -1,34 +1,34 @@
+import { createServer } from "node:http";
 import { loadRepositories } from "./config/repos.js";
 import { setupSshKey } from "./services/ssh.js";
 import { syncAll } from "./services/sync.js";
 import { logger } from "./utils/logger.js";
 
-async function main(): Promise<void> {
-  logger.info("Quasar-sync starting");
+let isSyncing = false;
+
+async function runSync(): Promise<{ success: boolean; summary: unknown }> {
+  if (isSyncing) {
+    return { success: false, summary: { error: "Sync already in progress" } };
+  }
+
+  isSyncing = true;
 
   try {
-    // Setup SSH authentication
-    await setupSshKey();
-
-    // Load repository configuration
     const repositories = loadRepositories();
-    logger.info({ count: repositories.length }, "Loaded repository configuration");
+    logger.info({ count: repositories.length }, "Starting sync");
 
-    // Run sync
-    const summary = syncAll(repositories);
+    const summary = await syncAll(repositories);
 
-    // Log summary
     logger.info(
       {
-        total: (await summary).total,
-        succeeded: (await summary).succeeded,
-        failed: (await summary).failed,
+        total: summary.total,
+        succeeded: summary.succeeded,
+        failed: summary.failed,
       },
       "Sync completed",
     );
 
-    // Log individual failures for visibility
-    for (const result of (await summary).results) {
+    for (const result of summary.results) {
       if (result.status === "failure") {
         logger.error(
           {
@@ -41,17 +41,56 @@ async function main(): Promise<void> {
       }
     }
 
-    // Exit with error code if any failures
-    if ((await summary).failed > 0) {
-      logger.error("Exiting with error due to sync failures");
-      process.exit(1);
-    }
-
-    logger.info("Quasar-sync completed successfully");
-  } catch (err) {
-    logger.fatal({ err }, "Fatal error during sync");
-    process.exit(1);
+    return {
+      success: summary.failed === 0,
+      summary: {
+        total: summary.total,
+        succeeded: summary.succeeded,
+        failed: summary.failed,
+      },
+    };
+  } finally {
+    isSyncing = false;
   }
 }
 
-main();
+async function main(): Promise<void> {
+  logger.info("Quasar-sync starting");
+
+  // Setup SSH authentication on startup
+  await setupSshKey();
+
+  const port = process.env.PORT ?? 3000;
+
+  const server = createServer(async (req, res) => {
+    if (req.method === "POST" && req.url === "/run") {
+      logger.info("Received /run request");
+
+      try {
+        const result = await runSync();
+
+        res.writeHead(result.success ? 200 : 500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(result.summary));
+      } catch (err) {
+        logger.error({ err }, "Sync failed");
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: (err as Error).message }));
+      }
+    } else if (req.method === "GET" && req.url === "/health") {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ status: "ok", syncing: isSyncing }));
+    } else {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Not found" }));
+    }
+  });
+
+  server.listen(port, () => {
+    logger.info({ port }, "Server listening");
+  });
+}
+
+main().catch((err) => {
+  logger.fatal({ err }, "Fatal error during startup");
+  process.exit(1);
+});
