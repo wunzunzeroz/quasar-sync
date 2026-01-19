@@ -10,11 +10,17 @@ const TEMP_BASE = join(tmpdir(), "kart-sync");
 
 /**
  * Builds the PostgreSQL working copy URL with schema appended.
- * Input:  postgresql://user:pass@host:5432/dbname
+ * Input:  postgresql://user:pass@host:5432/dbname (or postgres://)
  * Output: postgresql://user:pass@host:5432/dbname/schema_name
  */
 function buildWorkingCopyUrl(schema: string): string {
-  const baseUrl = env.DATABASE_URL.replace(/\/$/, ""); // Remove trailing slash if present
+  let baseUrl = env.DATABASE_URL.replace(/\/$/, ""); // Remove trailing slash if present
+
+  // Kart requires postgresql:// not postgres://
+  if (baseUrl.startsWith("postgres://")) {
+    baseUrl = baseUrl.replace("postgres://", "postgresql://");
+  }
+
   return `${baseUrl}/${schema}`;
 }
 
