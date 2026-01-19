@@ -1,0 +1,8 @@
+node_modules
+src
+*.md
+.git
+.gitignore
+.env*
+tsconfig.json
+.prettierrc

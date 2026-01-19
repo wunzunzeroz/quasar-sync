@@ -1,0 +1,10 @@
+repositories:
+  - name: Buoy Lateral Points
+    category: Hydro
+    url: kart@data.koordinates.com:linz/buoy-lateral-points-hydro-14k-122k
+
+  # Add more repositories here:
+  # - name: Another Dataset
+  #   category: Transport
+  #   url: kart@data.koordinates.com:linz/another-dataset
+  #   schema: custom_schema_name  # Optional: override auto-generated schema name
