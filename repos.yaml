@@ -3,6 +3,9 @@ repositories:
     category: Hydro
     url: kart@data.koordinates.com:linz/buoy-lateral-points-hydro-14k-122k
 
+  - name: Buoy Cardinal Points
+    category: Hydro
+    url: kart@data.koordinates.com:linz/buoy-cardinal-points-hydro-14k-122k
   # Add more repositories here:
   # - name: Another Dataset
   #   category: Transport
