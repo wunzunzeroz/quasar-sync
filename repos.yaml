@@ -1,82 +1,228 @@
 repositories:
   # Lateral Buoys
-  - key: navigation_aids__boylat_harbor
+  - key: navigation_aids__boylat__harbor
     name: Buoy Lateral Points
     category: Navigation Aids
     scale: harbor
     url: kart@data.koordinates.com:linz/buoy-lateral-points-hydro-14k-122k
 
-  - key: navigation_aids__boylat_approach
+  - key: navigation_aids__boylat__approach
     name: Buoy Lateral Points
     category: Navigation Aids
     scale: approach
     url: kart@data.koordinates.com:linz/buoy-lateral-points-hydro-122k-190k
 
-  - key: navigation_aids__boylat_coastal
+  - key: navigation_aids__boylat__coastal
     name: Buoy Lateral Points
     category: Navigation Aids
     scale: coastal
     url: kart@data.koordinates.com:linz/buoy-lateral-points-hydro-190k-1350k
 
   # Lateral Beacons
-  - key: navigation_aids__bcnlat_harbor
+  - key: navigation_aids__bcnlat__harbor
     name: Buoy Lateral Points
     category: Navigation Aids
     scale: harbor
     url: kart@data.koordinates.com:linz/beacon-lateral-points-hydro-14k-122k
 
-  - key: navigation_aids__bcnlat_approach
+  - key: navigation_aids__bcnlat__approach
     name: Buoy Lateral Points
     category: Navigation Aids
     scale: approach
     url: kart@data.koordinates.com:linz/beacon-lateral-points-hydro-122k-190k
 
-  - key: navigation_aids__bcnlat_coastal
+  - key: navigation_aids__bcnlat__coastal
     name: Buoy Lateral Points
     category: Navigation Aids
     scale: coastal
     url: kart@data.koordinates.com:linz/beacon-lateral-points-hydro-190k-1350k
 
   # Cardinal Buoys
-  - key: navigation_aids__boycar_harbor
+  - key: navigation_aids__boycar__harbor
     name: Buoy Cardinal Points
     category: Navigation Aids
     scale: harbor
     url: kart@data.koordinates.com:linz/buoy-cardinal-points-hydro-14k-122k
 
-  - key: navigation_aids__boycar_approach
+  - key: navigation_aids__boycar__approach
     name: Buoy Cardinal Points
     category: Navigation Aids
     scale: approach
     url: kart@data.koordinates.com:linz/buoy-cardinal-points-hydro-122k-190k
 
-  - key: navigation_aids__boycar_coastal
+  - key: navigation_aids__boycar__coastal
     name: Buoy Cardinal Points
     category: Navigation Aids
     scale: coastal
     url: kart@data.koordinates.com:linz/buoy-cardinal-points-hydro-190k-1350k
 
   # Cardinal Beacons
-  - key: navigation_aids__bcncar_harbor
+  - key: navigation_aids__bcncar__harbor
     name: Beacon Cardinal Points
     category: Navigation Aids
     scale: harbor
     url: kart@data.koordinates.com:linz/beacon-cardinal-points-hydro-14k-122k
 
-  - key: navigation_aids__bcncar_approach
+  - key: navigation_aids__bcncar__approach
     name: Beacon Cardinal Points
     category: Navigation Aids
     scale: approach
     url: kart@data.koordinates.com:linz/beacon-cardinal-points-hydro-122k-190k
 
-  - key: navigation_aids__bcncar_coastal
+  - key: navigation_aids__bcncar__coastal
     name: Beacon Cardinal Points
     category: Navigation Aids
     scale: coastal
     url: kart@data.koordinates.com:linz/beacon-cardinal-points-hydro-190k-1350k
 
-  # Add more repositories here:
-  # - key: another_dataset
-  #   name: Another Dataset
-  #   category: Transport
-  #   url: kart@data.koordinates.com:linz/another-dataset
+  # Isolated Danger Buoys
+  - key: navigation_aids__boyisd__harbor
+    name: Buoy Isolated Danger Points
+    category: Navigation Aids
+    scale: harbor
+    url: kart@data.koordinates.com:linz/buoy-isolated-danger-points-hydro-14k-122k
+
+  - key: navigation_aids__boyisd__approach
+    name: Buoy Isolated Danger Points
+    category: Navigation Aids
+    scale: approach
+    url: kart@data.koordinates.com:linz/buoy-isolated-danger-points-hydro-122k-190k
+
+  - key: navigation_aids__boyisd__coastal
+    name: Buoy Isolated Danger Points
+    category: Navigation Aids
+    scale: coastal
+    url: kart@data.koordinates.com:linz/buoy-isolated-danger-points-hydro-190k-1350k
+
+  # Isolated Danger Beacons
+  - key: navigation_aids__bcnisd__harbor
+    name: Beacon Isolated Danger Points
+    category: Navigation Aids
+    scale: harbor
+    url: kart@data.koordinates.com:linz/beacon-isolated-danger-points-hydro-14k-122k
+
+  - key: navigation_aids__bcnisd__approach
+    name: Beacon Isolated Danger Points
+    category: Navigation Aids
+    scale: approach
+    url: kart@data.koordinates.com:linz/beacon-isolated-danger-points-hydro-122k-190k
+
+  - key: navigation_aids__bcnisd__coastal
+    name: Beacon Isolated Danger Points
+    category: Navigation Aids
+    scale: coastal
+    url: kart@data.koordinates.com:linz/beacon-isolated-danger-points-hydro-190k-1350k
+
+  # Safe Water Buoys
+  - key: navigation_aids__boysaw__harbor
+    name: Buoy Safe Water Points
+    category: Navigation Aids
+    scale: harbor
+    url: kart@data.koordinates.com:linz/buoy-safe-water-points-hydro-14k-122k
+
+  - key: navigation_aids__boysaw__approach
+    name: Buoy Safe Water Points
+    category: Navigation Aids
+    scale: approach
+    url: kart@data.koordinates.com:linz/buoy-safe-water-points-hydro-122k-190k
+
+  - key: navigation_aids__boysaw__coastal
+    name: Buoy Safe Water Points
+    category: Navigation Aids
+    scale: coastal
+    url: kart@data.koordinates.com:linz/buoy-safe-water-points-hydro-190k-1350k
+
+  # Safe Water Beacons
+  - key: navigation_aids__bcnsaw__harbor
+    name: Beacon Safe Water Points
+    category: Navigation Aids
+    scale: harbor
+    url: kart@data.koordinates.com:linz/beacon-safe-water-points-hydro-14k-122k
+
+  - key: navigation_aids__bcnsaw__approach
+    name: Beacon Safe Water Points
+    category: Navigation Aids
+    scale: approach
+    url: kart@data.koordinates.com:linz/beacon-safe-water-points-hydro-122k-190k
+
+  - key: navigation_aids__bcnsaw__coastal
+    name: Beacon Safe Water Points
+    category: Navigation Aids
+    scale: coastal
+    url: kart@data.koordinates.com:linz/beacon-safe-water-points-hydro-190k-1350k
+
+  # Special Purpose Buoys
+  - key: navigation_aids__boyspp__harbor
+    name: Buoy Special Purpose Points
+    category: Navigation Aids
+    scale: harbor
+    url: kart@data.koordinates.com:linz/buoy-special-purpose-general-points-hydro-14k-122k
+
+  - key: navigation_aids__boyspp__approach
+    name: Buoy Special Purpose Points
+    category: Navigation Aids
+    scale: approach
+    url: kart@data.koordinates.com:linz/buoy-special-purpose-general-points-hydro-122k-190k
+
+  - key: navigation_aids__boyspp__coastal
+    name: Buoy Special Purpose Points
+    category: Navigation Aids
+    scale: coastal
+    url: kart@data.koordinates.com:linz/buoy-special-purpose-general-points-hydro-190k-1350k
+
+  # Special Purpose Beacons
+  - key: navigation_aids__bcnspp__harbor
+    name: Beacon Special Purpose Points
+    category: Navigation Aids
+    scale: harbor
+    url: kart@data.koordinates.com:linz/beacon-special-purpose-general-points-hydro-14k-122k
+
+  - key: navigation_aids__bcnspp__approach
+    name: Beacon Special Purpose Points
+    category: Navigation Aids
+    scale: approach
+    url: kart@data.koordinates.com:linz/beacon-special-purpose-general-points-hydro-122k-190k
+
+  - key: navigation_aids__bcnspp__coastal
+    name: Beacon Special Purpose Points
+    category: Navigation Aids
+    scale: coastal
+    url: kart@data.koordinates.com:linz/beacon-special-purpose-general-points-hydro-190k-1350k
+
+  # Topmark Points
+  - key: navigation_aids__topmar__harbor
+    name: Topmark Points
+    category: Navigation Aids
+    scale: harbor
+    url: kart@data.koordinates.com:linz/topmark-points-hydro-14k-122k
+
+  - key: navigation_aids__topmar__approach
+    name: Topmark Points
+    category: Navigation Aids
+    scale: approach
+    url: kart@data.koordinates.com:linz/topmark-points-hydro-122k-190k
+
+  - key: navigation_aids__topmar__coastal
+    name: Topmark Points
+    category: Navigation Aids
+    scale: coastal
+    url: kart@data.koordinates.com:linz/topmark-points-hydro-190k-1350k
+
+  # Light Points
+  - key: navigation_aids__lights__harbor
+    name: Light Points
+    category: Navigation Aids
+    scale: harbor
+    url: kart@data.koordinates.com:linz/light-points-hydro-14k-122k
+
+  - key: navigation_aids__lights__approach
+    name: Light Points
+    category: Navigation Aids
+    scale: approach
+    url: kart@data.koordinates.com:linz/light-points-hydro-122k-190k
+
+  - key: navigation_aids__lights__coastal
+    name: Light Points
+    category: Navigation Aids
+    scale: coastal
+    url: kart@data.koordinates.com:linz/light-points-hydro-190k-1350k
