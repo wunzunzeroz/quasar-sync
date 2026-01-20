@@ -36,7 +36,11 @@ function sanitizeForPath(name: string): string {
  */
 async function syncRepository(repo: Repository): Promise<SyncResult> {
   const startTime = Date.now();
-  const repoLogger = logger.child({ name: repo.name, category: repo.category });
+  const repoLogger = logger.child({
+    name: repo.name,
+    category: repo.category,
+    scale: repo.scale,
+  });
 
   repoLogger.info("Starting sync");
 
@@ -54,17 +58,17 @@ async function syncRepository(repo: Repository): Promise<SyncResult> {
     await cloneRepository(repo.url, tempDir);
 
     // Create working copy
-    const workingCopyUrl = buildWorkingCopyUrl(repo.schema!);
-    repoLogger.info({ schema: repo.schema }, "Creating PostGIS working copy");
+    const workingCopyUrl = buildWorkingCopyUrl(repo.key);
+    repoLogger.info({ schema: repo.key }, "Creating PostGIS working copy");
     await createWorkingCopy(tempDir, workingCopyUrl);
 
     const durationMs = Date.now() - startTime;
-    repoLogger.info({ durationMs, schema: repo.schema }, "Sync completed successfully");
+    repoLogger.info({ durationMs, schema: repo.key }, "Sync completed successfully");
 
     return {
       status: "success",
       repository: repo,
-      schema: repo.schema!,
+      schema: repo.key,
       durationMs,
     };
   } catch (err) {

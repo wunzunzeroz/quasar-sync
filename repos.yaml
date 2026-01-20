@@ -1,13 +1,82 @@
 repositories:
-  - name: Buoy Lateral Points
-    category: Hydro
+  # Lateral Buoys
+  - key: navigation_aids__boylat_harbor
+    name: Buoy Lateral Points
+    category: Navigation Aids
+    scale: harbor
     url: kart@data.koordinates.com:linz/buoy-lateral-points-hydro-14k-122k
 
-  - name: Buoy Cardinal Points
-    category: Hydro
+  - key: navigation_aids__boylat_approach
+    name: Buoy Lateral Points
+    category: Navigation Aids
+    scale: approach
+    url: kart@data.koordinates.com:linz/buoy-lateral-points-hydro-122k-190k
+
+  - key: navigation_aids__boylat_coastal
+    name: Buoy Lateral Points
+    category: Navigation Aids
+    scale: coastal
+    url: kart@data.koordinates.com:linz/buoy-lateral-points-hydro-190k-1350k
+
+  # Lateral Beacons
+  - key: navigation_aids__bcnlat_harbor
+    name: Buoy Lateral Points
+    category: Navigation Aids
+    scale: harbor
+    url: kart@data.koordinates.com:linz/beacon-lateral-points-hydro-14k-122k
+
+  - key: navigation_aids__bcnlat_approach
+    name: Buoy Lateral Points
+    category: Navigation Aids
+    scale: approach
+    url: kart@data.koordinates.com:linz/beacon-lateral-points-hydro-122k-190k
+
+  - key: navigation_aids__bcnlat_coastal
+    name: Buoy Lateral Points
+    category: Navigation Aids
+    scale: coastal
+    url: kart@data.koordinates.com:linz/beacon-lateral-points-hydro-190k-1350k
+
+  # Cardinal Buoys
+  - key: navigation_aids__boycar_harbor
+    name: Buoy Cardinal Points
+    category: Navigation Aids
+    scale: harbor
     url: kart@data.koordinates.com:linz/buoy-cardinal-points-hydro-14k-122k
+
+  - key: navigation_aids__boycar_approach
+    name: Buoy Cardinal Points
+    category: Navigation Aids
+    scale: approach
+    url: kart@data.koordinates.com:linz/buoy-cardinal-points-hydro-122k-190k
+
+  - key: navigation_aids__boycar_coastal
+    name: Buoy Cardinal Points
+    category: Navigation Aids
+    scale: coastal
+    url: kart@data.koordinates.com:linz/buoy-cardinal-points-hydro-190k-1350k
+
+  # Cardinal Beacons
+  - key: navigation_aids__bcncar_harbor
+    name: Beacon Cardinal Points
+    category: Navigation Aids
+    scale: harbor
+    url: kart@data.koordinates.com:linz/beacon-cardinal-points-hydro-14k-122k
+
+  - key: navigation_aids__bcncar_approach
+    name: Beacon Cardinal Points
+    category: Navigation Aids
+    scale: approach
+    url: kart@data.koordinates.com:linz/beacon-cardinal-points-hydro-122k-190k
+
+  - key: navigation_aids__bcncar_coastal
+    name: Beacon Cardinal Points
+    category: Navigation Aids
+    scale: coastal
+    url: kart@data.koordinates.com:linz/beacon-cardinal-points-hydro-190k-1350k
+
   # Add more repositories here:
-  # - name: Another Dataset
+  # - key: another_dataset
+  #   name: Another Dataset
   #   category: Transport
   #   url: kart@data.koordinates.com:linz/another-dataset
-  #   schema: custom_schema_name  # Optional: override auto-generated schema name

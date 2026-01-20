@@ -1,8 +1,11 @@
+export type Scale = "harbor" | "approach" | "coastal" | "general" | "overview";
+
 export interface Repository {
+  key: string; // Unique identifier used as PostgreSQL schema name
   name: string;
   category: string;
+  scale: Scale;
   url: string;
-  schema?: string; // Optional override; defaults to sanitized name from URL
 }
 
 export interface SyncSuccess {
