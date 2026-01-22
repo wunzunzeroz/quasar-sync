@@ -42,6 +42,7 @@ export async function querySourceSchema(schemaName: string): Promise<SourceRow[]
     FROM information_schema.tables
     WHERE table_schema = ${schemaName}
     AND table_type = 'BASE TABLE'
+    AND table_name NOT LIKE '_kart%'
   `;
 
   if (tables.length === 0) {
