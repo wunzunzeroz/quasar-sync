@@ -6,17 +6,17 @@ repositories:
     scale: harbor
     url: kart@data.koordinates.com:linz/buoy-lateral-points-hydro-14k-122k
 
-  # - key: navigation_aids__boylat__approach
-  #   name: Buoy Lateral Points
-  #   category: Navigation Aids
-  #   scale: approach
-  #   url: kart@data.koordinates.com:linz/buoy-lateral-points-hydro-122k-190k
+  - key: navigation_aids__boylat__approach
+    name: Buoy Lateral Points
+    category: Navigation Aids
+    scale: approach
+    url: kart@data.koordinates.com:linz/buoy-lateral-points-hydro-122k-190k
 
-  # - key: navigation_aids__boylat__coastal
-  #   name: Buoy Lateral Points
-  #   category: Navigation Aids
-  #   scale: coastal
-  #   url: kart@data.koordinates.com:linz/buoy-lateral-points-hydro-190k-1350k
+  - key: navigation_aids__boylat__coastal
+    name: Buoy Lateral Points
+    category: Navigation Aids
+    scale: coastal
+    url: kart@data.koordinates.com:linz/buoy-lateral-points-hydro-190k-1350k
 
   # # Lateral Beacons
   # - key: navigation_aids__bcnlat__harbor
