@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 import { loadRepositories } from "./config/repos.js";
 import { setupSshKey } from "./services/ssh.js";
 import { syncAll } from "./services/sync.js";
+import { transformAll } from "./services/transform.js";
 import { logger } from "./utils/logger.js";
 
 let isSyncing = false;
@@ -17,18 +18,19 @@ async function runSync(): Promise<{ success: boolean; summary: unknown }> {
     const repositories = loadRepositories();
     logger.info({ count: repositories.length }, "Starting sync");
 
-    const summary = await syncAll(repositories);
+    // Step 1: Sync all repositories
+    const syncSummary = await syncAll(repositories);
 
     logger.info(
       {
-        total: summary.total,
-        succeeded: summary.succeeded,
-        failed: summary.failed,
+        total: syncSummary.total,
+        succeeded: syncSummary.succeeded,
+        failed: syncSummary.failed,
       },
       "Sync completed",
     );
 
-    for (const result of summary.results) {
+    for (const result of syncSummary.results) {
       if (result.status === "failure") {
         logger.error(
           {
@@ -41,12 +43,36 @@ async function runSync(): Promise<{ success: boolean; summary: unknown }> {
       }
     }
 
+    // Step 2: Transform synced data to destination database
+    const schemaKeys = repositories.map((r) => r.key);
+    logger.info({ count: schemaKeys.length }, "Starting transform");
+
+    const transformSummary = await transformAll(schemaKeys);
+
+    logger.info(
+      {
+        total: transformSummary.total,
+        succeeded: transformSummary.succeeded,
+        failed: transformSummary.failed,
+        skipped: transformSummary.skipped,
+      },
+      "Transform completed",
+    );
+
     return {
-      success: summary.failed === 0,
+      success: syncSummary.failed === 0 && transformSummary.failed === 0,
       summary: {
-        total: summary.total,
-        succeeded: summary.succeeded,
-        failed: summary.failed,
+        sync: {
+          total: syncSummary.total,
+          succeeded: syncSummary.succeeded,
+          failed: syncSummary.failed,
+        },
+        transform: {
+          total: transformSummary.total,
+          succeeded: transformSummary.succeeded,
+          failed: transformSummary.failed,
+          skipped: transformSummary.skipped,
+        },
       },
     };
   } finally {

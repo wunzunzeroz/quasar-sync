@@ -2,7 +2,7 @@ import { mkdirSync, rmSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import type { Repository, SyncResult, SyncSummary } from "../domain/types.js";
-import { cloneRepository, createWorkingCopy } from "./kart.js";
+import { cloneRepository, createWorkingCopy, dropSchema } from "./kart.js";
 import { env } from "../config/env.js";
 import { logger } from "../utils/logger.js";
 
@@ -52,6 +52,10 @@ async function syncRepository(repo: Repository): Promise<SyncResult> {
       rmSync(tempDir, { recursive: true, force: true });
     }
     mkdirSync(tempDir, { recursive: true });
+
+    // Drop schema before sync (Kart expects non-existent or empty schema)
+    repoLogger.info({ schema: repo.key }, "Dropping existing schema");
+    await dropSchema(repo.key);
 
     // Clone the repository
     repoLogger.info("Cloning repository");

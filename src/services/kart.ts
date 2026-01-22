@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import { KartError } from "../domain/errors.js";
 import { logger } from "../utils/logger.js";
+import { sourceDb } from "../db/source-client.js";
 
 interface ExecResult {
   stdout: string;
@@ -87,4 +88,16 @@ export async function createWorkingCopy(
   }
 
   logger.debug({ repoPath }, "Working copy created");
+}
+
+/**
+ * Drops a PostgreSQL schema if it exists.
+ * Kart expects the schema to either not exist or be empty.
+ */
+export async function dropSchema(schemaName: string): Promise<void> {
+  logger.debug({ schemaName }, "Dropping schema if exists");
+
+  await sourceDb`DROP SCHEMA IF EXISTS ${sourceDb(schemaName)} CASCADE`;
+
+  logger.debug({ schemaName }, "Schema dropped");
 }

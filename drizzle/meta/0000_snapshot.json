@@ -1,0 +1,183 @@
+{
+  "id": "a211027d-c13b-4cb5-a1ec-b3b83b4f727f",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.navigation_aids": {
+      "name": "navigation_aids",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "source_schema": {
+          "name": "source_schema",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_key": {
+          "name": "source_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_fidn": {
+          "name": "source_fidn",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_object_type": {
+          "name": "source_object_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scale_band": {
+          "name": "scale_band",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geom": {
+          "name": "geom",
+          "type": "geometry(point)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "structure_type": {
+          "name": "structure_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mark_category": {
+          "name": "mark_category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lateral_side": {
+          "name": "lateral_side",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "shape": {
+          "name": "shape",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "colors": {
+          "name": "colors",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "color_pattern": {
+          "name": "color_pattern",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "topmark_shape": {
+          "name": "topmark_shape",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "topmark_color": {
+          "name": "topmark_color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "has_light": {
+          "name": "has_light",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "light_characteristic": {
+          "name": "light_characteristic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "light_color": {
+          "name": "light_color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "light_range_nm": {
+          "name": "light_range_nm",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "light_elevation_m": {
+          "name": "light_elevation_m",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "properties": {
+          "name": "properties",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        }
+      },
+      "indexes": {
+        "navigation_aids_source_key_idx": {
+          "name": "navigation_aids_source_key_idx",
+          "columns": [
+            {
+              "expression": "source_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
