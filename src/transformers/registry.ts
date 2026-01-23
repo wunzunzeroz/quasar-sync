@@ -1,4 +1,5 @@
 import type { Transformer } from "./types.js";
+import { bcnlatTransformer } from "./bcnlat.js";
 import { boylatTransformer } from "./boylat.js";
 
 /**
@@ -6,6 +7,10 @@ import { boylatTransformer } from "./boylat.js";
  * Schemas not in this registry will be skipped during transformation.
  */
 const transformerRegistry: Record<string, Transformer> = {
+  // Lateral Beacons - all scales use the same transformer
+  navigation_aids__bcnlat__harbor: bcnlatTransformer,
+  navigation_aids__bcnlat__approach: bcnlatTransformer,
+  navigation_aids__bcnlat__coastal: bcnlatTransformer,
   // Lateral Buoys - all scales use the same transformer
   navigation_aids__boylat__harbor: boylatTransformer,
   navigation_aids__boylat__approach: boylatTransformer,
