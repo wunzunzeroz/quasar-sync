@@ -9,6 +9,38 @@
 
 ---
 
+> ## ⚑ UPDATE (2026-08) — read this first
+>
+> This draft has been overtaken by implementation. The **authoritative, device-verified
+> plan now lives in `quasar-frontend/docs/offline-first-maplibre-spec.md`**, which explicitly
+> *supersedes / absorbs* this doc. The backend-pipeline design below is carried forward
+> largely intact; read it through the lens of these changes:
+>
+> 1. **Renderer is HYBRID, not all-MapLibre.** Web = MapLibre GL JS. **Native = Mapbox
+>    (`@rnmapbox/maps`) as a *renderer only*** — kept solely because MapLibre Native has **no
+>    3D terrain/sky yet**. There is **no Mapbox-hosted *data*** anywhere (styles are
+>    Protomaps/LINZ, glyphs are open Noto, tiles are our PMTiles). **Endstate:** converge to
+>    all-MapLibre once MapLibre Native ships 3D terrain — the data layer is engine-portable,
+>    so the swap is cheap and web never changes.
+> 2. **Native PMTiles via an interceptor, not `pmtiles://`.** The Mapbox renderer can't read
+>    `pmtiles://`, so a custom Expo module **`quasar-tiles`** registers a Mapbox v11
+>    `HttpServiceInterceptor` that decodes PMTiles v3 in-process (Kotlin/Swift) — R2 range
+>    reads online, local archive files offline. **Device-verified byte-identical** to the
+>    `pmtiles` JS library. (Note: spike **S1 actually passed for MapLibre Native too** — it
+>    *can* read local PMTiles offline; the Mapbox pivot is about **terrain**, not PMTiles.)
+> 3. **Basemap = Protomaps + LINZ, not LINZ-only.** A Protomaps OSM-derived global vector
+>    base (tiny, fully offline) with **LINZ layers on top** (topo vector, aerial raster,
+>    nautical charts). Refines the "LINZ base" line in §4/§6.
+> 4. **Storage/CDN = Cloudflare R2** at `tiles.quasarcloud.co` (CORS-enabled). Spike **S4
+>    resolved.**
+> 5. **Dataset scope is broader than nautical** — alpine + backcountry too: ATES avalanche
+>    terrain, slope/aspect (1 m LiDAR), contours/heights/names, DOC huts/campsites/tracks.
+>    See the corrected catalog in §6.3.
+>
+> Corrected specifics are inlined in §4, §6.3, §10, §11 and §17 below.
+
+---
+
 ## 1. Summary
 
 QUASAR needs to compute its own map tiles on the backend and serve them to web and
@@ -90,11 +122,12 @@ built on MapLibre + PMTiles, so this follows a proven NZ-government blueprint.
 | Native offline fallback | **MBTiles emitted alongside** | De-risks native SDKs that digest local MBTiles more easily. |
 | Vector baker | **tippecanoe** | Industry standard; per-zoom generalization control. |
 | Raster baker | **GDAL / gdaldem** | Standard slope/aspect/hillshade + tiling. |
-| Renderer | **MapLibre GL JS (web) + @maplibre/maplibre-react-native (native)** | Open, offline-friendly, no tokens; PMTiles support. Mapbox rejected: proprietary SDK, token/billing, weak custom-tile offline. |
-| Basemap | **LINZ (topo vector + aerial raster), self-hosted PMTiles** | NZ-authoritative; LINZ Basemaps is MapLibre+PMTiles already. Hosted provider rejected: runtime dependency + offline licensing seam. |
+| Renderer | **HYBRID: MapLibre GL JS (web) + Mapbox `@rnmapbox/maps` (native, renderer-only)** | Web: open, no tokens, clean PMTiles via `addProtocol`. Native: Mapbox kept **only** for 3D terrain/sky (MapLibre Native lacks it). No Mapbox-hosted *data*. Converge to all-MapLibre when MapLibre Native ships terrain. |
+| Native PMTiles | **`quasar-tiles` Expo module — Mapbox v11 `HttpServiceInterceptor`** | Mapbox renderer can't read `pmtiles://`; interceptor decodes PMTiles v3 in-process (R2 range online / local file offline). Device-verified. |
+| Basemap | **Protomaps (global OSM vector base) + LINZ on top (topo vector, aerial raster, nautical), self-hosted PMTiles** | Protomaps base is tiny + fully offline; LINZ adds NZ authority. Hosted provider rejected: runtime dependency + offline licensing seam. |
 | Style spec | **MapLibre style JSON (open subset)** | Restyle without re-baking; renderer stays swappable. |
 | Serving | **Object storage + CDN, range requests** | Boring, scalable; "tile server" is just files. |
-| Storage | **R2 (zero egress) or GCS+Cloud CDN (in-region)** | Egress dominates tile cost; both viable. |
+| Storage | **Cloudflare R2** (`tiles.quasarcloud.co`, CORS-enabled) | Zero egress; range-request serving. S4 resolved. |
 | Live/user data | **Authed GeoJSON via Nest** | Small, per-workspace, volatile — tiling adds nothing. |
 
 Decision log / ADR narrative lives in §17 open questions + git history of this file.
@@ -215,16 +248,26 @@ interface TileRecipe {
 // registry: Map<string, TileRecipe>  — getRecipe(config.recipe)
 ```
 
-### 6.3 Tileset catalog (initial)
+### 6.3 Tileset catalog (current)
 
-| id | role | kind | recipe | source | strategy | cadence |
+Reflects the frontend `overlayRegistry.ts` + basemap config. **Hosting status** is the key
+migration axis: the **base is already self-hosted PMTiles**; the **overlays are still
+Mapbox-hosted `mapbox://mttchpmn.*` tilesets** (native renders them today via the public
+`pk.` token; web stays dark) **pending re-bake to self-hosted PMTiles (Phase 5)**.
+
+| id | role | kind | category | source | strategy | hosting status |
 |---|---|---|---|---|---|---|
-| `linz-topo` | basemap | vector | `vector-linz` | LINZ topographic | offline-first | cron (infrequent) |
-| `linz-aerial` | basemap | raster | `raster-imagery` | LINZ aerial | **online-first** | cron (infrequent) |
-| `navaids` | overlay | vector | `vector-postgis` | dest PostGIS `navigation_aids` | offline-first | on-sync |
-| `slope-gradient` | overlay | raster | `raster-dem` | LINZ DEM (derive=slope) | offline-first | manual |
-| `slope-aspect` | overlay | raster | `raster-dem` | LINZ DEM (derive=aspect) | offline-first | manual |
-| `crags` | overlay | vector | `vector-postgis`/`vector-geojson` | TBD | offline-first | manual |
+| `basemap` (Protomaps) | basemap | vector | — | Protomaps NZ extract (`nz-basemap-v1.pmtiles`) | offline-first | **self-hosted PMTiles (R2) ✅** |
+| LINZ aerial | basemap | raster | — | LINZ aerial | **online-first** | mounts on top of base for the "Aerial" variant |
+| LINZ terrain (DEM) | — | raster | — | LINZ terrain-RGB | — | self-hosted `raster-dem` (drives 3D terrain) |
+| `navaids` | overlay | vector | general | dest PostGIS `navigation_aids` | offline-first | to bake (`vector-postgis`) |
+| `avalancheTerrain` (ATES) | overlay | raster/vector | alpine | NZ ATES | offline-first | Mapbox-hosted → re-bake (Phase 5) |
+| `slope` | overlay | raster | alpine | 1 m LiDAR DEM (gdaldem slope) | offline-first | Mapbox-hosted → re-bake (Phase 5) |
+| `aspect` | overlay | raster | alpine | 1 m LiDAR DEM (gdaldem aspect) | offline-first | Mapbox-hosted → re-bake (Phase 5) |
+| `topographic` | overlay | vector | topographic | LINZ contours + heights + names | offline-first | Mapbox-hosted → re-bake (Phase 5) |
+| `contourHighlights` | overlay | vector | topographic | LINZ contours | offline-first | Mapbox-hosted → re-bake (Phase 5) |
+| `docHuts` / `docCampsites` / `docTracks` | overlay | vector | general | DOC | offline-first | Mapbox-hosted → re-bake (Phase 5) |
+| nautical charts | overlay | raster | general | LINZ nautical | offline-first | online now via `buildNauticalStyle()`; bake later (Phase 5b) |
 
 ### 6.4 Independent versioning & generations
 
@@ -341,10 +384,23 @@ DEM (COG)
 
 ## 10. Frontend Integration (MapLibre)
 
-### 10.1 Renderers
-- Web: **MapLibre GL JS**. Native: **@maplibre/maplibre-react-native**.
-- PMTiles via the `pmtiles` protocol handler (`addProtocol("pmtiles", …)`) on web;
-  native local-PMTiles support to be verified (§17 spike).
+### 10.1 Renderers (HYBRID — device-verified)
+- **Web: MapLibre GL JS.** Reads `pmtiles://` directly via `addProtocol("pmtiles", …)`
+  (`ensurePmtilesProtocol.web.ts`); local range reads online + offline. Full 3D terrain.
+- **Native: Mapbox `@rnmapbox/maps` (renderer only).** Chosen solely for 3D terrain/sky,
+  which MapLibre Native lacks. No Mapbox-hosted data.
+- **Native PMTiles = the `quasar-tiles` interceptor.** The Mapbox renderer can't read
+  `pmtiles://`, so native style sources reference a **synthetic host**
+  `https://pmtiles.quasar.internal/{archiveKey}/{z}/{x}/{y}.mvt`
+  (`pmtilesConfig.ts`), and the `quasar-tiles` Expo module's Mapbox v11
+  `HttpServiceInterceptor` answers those requests in-process from PMTiles v3 (R2 range
+  online / local file offline). API: `installQuasarTiles()` (idempotent, before first
+  MapView mount) + `registerArchive(key, {url | path})` + `unregisterArchive(key)`.
+- **Stable archive keys.** Keys (e.g. `BASEMAP_ARCHIVE_KEY = "basemap"`) are stable; the
+  generation/version lives in the **registered source URL**, not the key — so the Mapbox
+  style never changes per generation, while data swaps underneath (§9.2 refinement).
+- **Endstate:** drop the Mapbox native SDK and go all-MapLibre once MapLibre Native ships
+  3D terrain. The data layer is engine-portable; web never changes.
 
 ### 10.2 Style composition
 - Base style = LINZ topographic MapLibre style (customized). Overlay tilesets contribute
@@ -384,8 +440,13 @@ async function resolveTile(id: string, z: number, x: number, y: number)
 - `fromNetwork` for aerial may target the CDN copy or LINZ directly, per config.
 - **Timeout budget** on `fromNetwork` for online-first so a flaky link degrades to cache
   quickly rather than hanging the map.
-- Native caveat: MapLibre Native's custom-protocol/source hooks are more limited than web
-  — the resolver may need a native shim (local range-reader). Flagged as a spike (§17).
+- **Native realization:** on Mapbox native the strategy is enforced *inside* the
+  `quasar-tiles` interceptor, not in JS. `registerArchive(key, {url})` binds a key to the
+  R2 archive (online); when an offline pack is downloaded, `registerArchive(key, {path})`
+  re-binds the same key to the local file — an **atomic source swap**, which is how a pack
+  takes over from the network. For **online-first aerial**, the interceptor tries the R2
+  range read first and falls back to the local archive on failure/offline (skip on coverage
+  gap). Web uses the `addProtocol` resolver above.
 
 ### 10.4 Attribution
 - Render required attribution strings (LINZ CC-BY etc.) from the manifest per active
@@ -404,6 +465,13 @@ async function resolveTile(id: string, z: number, x: number, y: number)
 - Download `{id}-v{gen}.pmtiles` (or MBTiles on native), verify `sha256` from manifest,
   then **atomically** flip the local pointer for that tileset id. Never render a
   partially-written file.
+- **Native swap = `registerArchive(key, {path})`** re-binding the archive key from its R2
+  URL to the downloaded local file — the interceptor picks it up in-process.
+- **Status — Phase 4 (not yet built).** The clean domain interfaces
+  (`OfflineTileManager` / `OfflinePack` / `CreatePackInput`) are **retained intact**; the
+  native manager is currently a no-op stub (`RnmapboxOfflineTileManager.native.ts`) and the
+  "Offline Maps" tab is hidden. Real offline lands as a `PmtilesOfflineTileManager`
+  (download/verify/atomic-swap via `expo-file-system`) behind those same interfaces.
 
 ### 11.3 Storage budget & eviction
 - Per-tileset + global storage budgets. Evict oldest generations / least-recent AOIs
@@ -442,6 +510,11 @@ async function resolveTile(id: string, z: number, x: number, y: number)
 
 - `GET /tiles/manifest` — current tileset catalog (short TTL / SWR). The only tile-related
   API. **Never proxies tile bytes.**
+- **Status — not yet built.** `quasar-api` has no tile/manifest endpoints today; the
+  basemap URL is currently env-pinned in the frontend
+  (`EXPO_PUBLIC_PROTOMAPS_BASEMAP_URL`, default `tiles.quasarcloud.co/nz-basemap-v1.pmtiles`)
+  and archive keys are registered directly. The manifest indirection is a later step so
+  clients discover generations instead of hard-coding URLs.
 - Authed GeoJSON endpoints for live/user data (existing domain patterns).
 - Optionally: signed-URL minting for any tilesets that must be access-controlled (default:
   reference tiles are public + cacheable).
@@ -489,16 +562,18 @@ async function resolveTile(id: string, z: number, x: number, y: number)
 
 ## 17. Open Questions / Spikes to Resolve
 
-- **S1 (highest risk) — MapLibre Native PMTiles offline:** verify first-class local
-  PMTiles source support in the target `@maplibre/maplibre-react-native` version. Fallback:
-  ship MBTiles to device + native range-reader shim.
-- **S2 — Native online-first resolver:** confirm how to implement the §10.3 resolver on
-  MapLibre Native (custom source / protocol equivalents, or a localhost tile shim).
+- **S1 — Native PMTiles offline — ✅ RESOLVED.** Phase-0 spike confirmed MapLibre Native
+  *does* support `pmtiles://file://` local offline (Android ≥ 11.7.0 + iOS). But the native
+  **renderer** is Mapbox (for 3D terrain), so native PMTiles is delivered via the
+  `quasar-tiles` `HttpServiceInterceptor` — **device-verified byte-identical** to the
+  `pmtiles` JS lib. Remaining: keep emitting **MBTiles** as a documented safety net.
+- **S2 — Native online-first resolver — ✅ RESOLVED.** Enforced inside the interceptor via
+  `registerArchive` URL↔path swaps (§10.3), not a JS resolver. Device-verified.
 - **S3 — LINZ self-host data path:** confirm the concrete route to bake LINZ topo (vector)
   and aerial (raster) into our own PMTiles (LINZ Data Service exports vs LINZ Basemaps
   artifacts); confirm redistribution + offline terms per dataset.
-- **S4 — Storage/CDN choice:** R2 (zero egress) vs GCS+Cloud CDN (in-region). Decide on
-  cost + latency for NZ users.
+- **S4 — Storage/CDN choice — ✅ RESOLVED.** Cloudflare R2 (`tiles.quasarcloud.co`,
+  CORS-enabled), zero egress + range serving.
 - **S5 — Tiler triggering:** sync→tiler trigger mechanism (HTTP call vs job row vs queue)
   and whether tiler starts as a `quasar-sync` phase or a standalone Railway service from
   day 1 (recommended: standalone, behind the recipe interface).
