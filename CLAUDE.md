@@ -2,7 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **Workspace context:** this repo is one of several that make up QUASAR. For the
+> product definition, the repo map, and the cross-repo seams, see
+> `../quasar-workspace/CLAUDE.md`
+> ([wunzunzeroz/quasar-workspace](https://github.com/wunzunzeroz/quasar-workspace)).
+
 ## Project Overview
+
+QUASAR is an offline-first outdoor operating system for New Zealand — mapping,
+navigation, and trip planning across alpine and marine terrain. `quasar-sync` is
+the **data ingestion worker** at the head of that pipeline: it mirrors the
+external geospatial datasets (currently LINZ hydrographic charts) that
+`quasar-api` serves and the app renders as map layers.
 
 Quasar-sync is a Kart repository synchronization service that clones Kart repositories and pushes data to a PostGIS database. It's designed to run as a Dockerized service on Railway, triggered by cron jobs.
 
